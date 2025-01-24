@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>管理员界面</h2>
+<h3>当前问题：{{ question }}</h3>
+
+<form method="post">
+    <button type="submit" name="next_question" {% if answer_open %}disabled{% endif %}>
+        下一题
+    </button>
+</form>
+
+<h3>用户回答和评分</h3>
+<form method="post">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for user, answer in all_answers.items() %}
+        <div style="display: flex; align-items: center; gap: 10px; border: 1px solid #ddd; padding: 10px;">
+            <div style="flex: 1;"><strong>{{ user }}</strong></div>
+            <div style="flex: 3;">{{ answer }}</div>
+            <div style="flex: 1;">
+                <input type="number" name="{{ user }}_score" min="0" max="10" value="0" required>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button type="submit" name="submit_scores">提交分数</button>
+</form>
+
+<h3>排行榜</h3>
+<table>
+    <thead>
+        <tr>
+            <th>排名</th>
+            <th>用户名</th>
+            <th>各题得分</th>
+            <th>总分</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for idx, (user, scores, total) in enumerate(rankings, start=1) %}
+        <tr>
+            <td>{{ idx }}</td>
+            <td>{{ user }}</td>
+            <td>{{ scores }}</td>
+            <td>{{ total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    setInterval(() => {
+        fetch('/api/check_submissions')
+            .then(response => response.json())
+            .then(data => {
+                console.log("已提交用户:", data.submitted_users);
+                // 此处可根据需要更新 UI
+            });
+    }, 5000); // 每5秒检查一次
+</script>
+{% endblock %}

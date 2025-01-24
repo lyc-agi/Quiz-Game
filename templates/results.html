@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>结果公布</h2>
+<h3>排行榜</h3>
+<ol>
+    {% for user, score in rankings %}
+    <li>{{ user }}: {{ score }} 分</li>
+    {% endfor %}
+</ol>
+
+<h3>用户答案</h3>
+{% for user, answers in all_answers.items() %}
+<h4>{{ user }}</h4>
+<ul>
+    {% for i, ans in answers.items() %}
+    <li>问题{{ i+1 }}: {{ questions[i] }} 答案：{{ ans }}</li>
+    {% endfor %}
+</ul>
+{% endfor %}
+{% endblock %}

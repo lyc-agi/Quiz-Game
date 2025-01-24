@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .expand-feedback-content {
+        display: none;
+    }
+    .click-like-or-dislike {
+        background-color: #d3d3d3;
+        pointer-events: none;
+    }
+</style>
+
+<h2>答题中</h2>
+<p>当前题目（{{ question_num }}）：</p>
+<p><strong>{{ question }}</strong></p>
+<form method="post">
+    <input type="text" name="answer" required>
+    <button type="submit" class="like-btn" onclick="submitFeedbackForm(1)">提交答案</button>
+</form>
+
+
+
+<h3>排行榜</h3>
+<table>
+    <thead>
+        <tr>
+            <th>排名</th>
+            <th>用户名</th>
+            <th>各题得分</th>
+            <th>总分</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for idx, (user, scores, total) in enumerate(rankings, start=1) %}
+        <tr>
+            <td>{{ idx }}</td>
+            <td>{{ user }}</td>
+            <td>{{ scores }}</td>
+            <td>{{ total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+     function submitFeedbackForm(user_likes_document) {
+
+        if (user_likes_document === 1) {
+            document.querySelector('.like-btn').classList.add('click-like-or-dislike');
+            document.getElementById("expandContentLike").style.display = 'block';
+        } else {
+            document.querySelector('.dislike-btn').classList.add('click-like-or-dislike');
+            document.getElementById("expandContent").style.display = 'block';
+        }
+
+        document.querySelector('.like-btn').style.pointerEvents = 'none';
+        document.querySelector('.dislike-btn').style.pointerEvents = 'none';
+    }
+
+    function checkScore() {
+        fetch("/check_score")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "scored") {
+                    // 刷新页面以显示新结果
+                    location.reload();
+                }
+            })
+            .catch(error => console.error("Error checking score:", error));
+    }
+
+    // 每5秒检查一次评分状态
+    setInterval(checkScore, 5000);
+</script>
+
+</script>
+{% endblock %}

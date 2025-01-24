@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回答问题</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1 id="question-text">加载问题中...</h1>
+    <form id="answer-form">
+        <label for="answer">你的答案:</label>
+        <input type="text" id="answer" name="answer" required>
+        <button type="submit">提交答案</button>
+    </form>
+    <div id="answer-status"></div>
+
+    <script src="/static/scripts.js"></script>
+    <script>
+        fetch('/question', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    document.getElementById('question-text').innerText = data.message;
+                } else {
+                    document.getElementById('question-text').innerText = data.question;
+                }
+            });
+
+        document.getElementById('answer-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const answer = document.getElementById('answer').value;
+
+            fetch('/question', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answer: answer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('answer-status').innerText = data.message;
+            });
+        });
+    </script>
+</body>
+</html>
